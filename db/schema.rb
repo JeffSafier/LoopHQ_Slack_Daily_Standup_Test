@@ -10,15 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_04_221955) do
-  create_table "standup_informations", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
+ActiveRecord::Schema[8.1].define(version: 2025_12_05_052858) do
+  create_table "standup_information", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
     t.text "blockers"
     t.datetime "created_at", null: false
-    t.text "today_work", null: false
+    t.date "standup_date"
+    t.text "todays_work", null: false
     t.datetime "updated_at", null: false
-    t.bigint "users_id", null: false
+    t.bigint "user_id", null: false
     t.text "yesterdays_work", null: false
-    t.index ["users_id"], name: "index_standup_informations_on_users_id"
+    t.index ["user_id"], name: "index_standup_information_on_user_id"
   end
 
   create_table "users", charset: "utf8mb4", collation: "utf8mb4_0900_ai_ci", force: :cascade do |t|
@@ -30,5 +31,5 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_04_221955) do
     t.index ["name", "team_id"], name: "index_users_on_name_and_team_id", unique: true
   end
 
-  add_foreign_key "standup_informations", "users", column: "users_id"
+  add_foreign_key "standup_information", "users"
 end
