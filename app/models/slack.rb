@@ -19,6 +19,15 @@ class Slack
                        body: modal_body(trigger_id)
     )
     end
+  def process_data(user_info:, standup_data:)
+    User.transaction do
+      user = User.find_or_create_by(slack_user_id: user_info.id) do |us|
+        us.name = user_info["user_name"]
+        us.team_id = user_info["team_id"]
+      end
+      Rails.logger.info "User #{user}"
+    end
+  end
 
   private
 
@@ -37,8 +46,7 @@ class Slack
             ]
           }
         ]
-    }.to_
-    json
+    }.to_json
   end
 
   def modal_body(trigger_id)
