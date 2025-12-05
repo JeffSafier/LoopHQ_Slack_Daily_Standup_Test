@@ -18,15 +18,27 @@ class Slack
                        },
                        body: modal_body(trigger_id)
     )
-    end
+    rc == "ok"
+  end
+
   def process_data(user_info:, standup_data:)
     User.transaction do
-      user = User.find_or_create_by(slack_user_id: user_info.id) do |us|
-        us.name = user_info["user_name"]
+      user = User.find_or_create_by!(slack_user_id: user_info["id"]) do |us|
+        us.name = user_info["username"]
         us.team_id = user_info["team_id"]
+        us.slack_user_id = user_info["id"]
       end
-      Rails.logger.info "User #{user}"
+      standup_info = StandupInformation.find_or_create_by!(standup_date: Date.current.strftime("%Y-%m-%d"), user_id: user.id) do |info|
+        info.standup_date = Date.current.strftime("%Y-%m-%d")
+        info.user_id = user.id
+        info.yesterdays_work = standup_data.dig("yesterday_block", "yesterday", "value")
+        info.todays_work = standup_data.dig("today_block", "today", "value")
+        info.blockers =standup_data.dig("blockers_block", "blockers", "value")
+      end
     end
+    true
+  rescue Mysql2::Error => e
+    false
   end
 
   private
